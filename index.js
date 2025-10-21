@@ -1,29 +1,24 @@
 const express = require('express');
 const app = express();
 
+// Librería nativa para usar fechas con zona horaria
+const { DateTime } = require('luxon');
+
 app.get('/', (req, res) => {
-  const now = new Date();
+  try {
+    // Usar Luxon para obtener la hora en Ciudad de México
+    const dt = DateTime.now().setZone('America/Mexico_City');
 
-  // Obtiene la fecha y hora en formato string con zona horaria de México
-  const mexicoDateStr = now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', hour12: false });
+    const id = dt.toFormat('yyyyMMddHHmmss');
 
-  // Convierte la cadena a objeto Date para manipularla
-  const mexicoDate = new Date(mexicoDateStr);
-
-  const pad = (num) => num.toString().padStart(2, '0');
-
-  const id = 
-    mexicoDate.getFullYear().toString() +
-    pad(mexicoDate.getMonth() + 1) +
-    pad(mexicoDate.getDate()) +
-    pad(mexicoDate.getHours()) +
-    pad(mexicoDate.getMinutes()) +
-    pad(mexicoDate.getSeconds());
-
-  res.send(`ID generado (hora México): ${id}`);
+    res.send(`ID generado (hora México): ${id}`);
+  } catch (error) {
+    console.error("Error generando el ID:", error);
+    res.status(500).send("Ocurrió un error.");
+  }
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`App escuchando en puerto ${port}`);
+  console.log(`Servidor activo en puerto ${port}`);
 });
